@@ -17,11 +17,21 @@ const server = http.createServer(app);
 // wss server on top of http server
 const wss = new WebSocket.Server({server});
 
-// 서버의 socket은 연결된 브라우저를 뜻함
-function handleConnection(socket) {
-  console.log(socket);
-}
 // after connection ==> 브라우저가 socket을 받는다.
-wss.on("connection", handleConnection);
+wss.on("connection", (socket) => {
+  // 아래의 코드들은 브라우저가 서버에 connection 되었을 때만 실행
+  console.log("Connected to Browser ✅");
+
+  // 브라우저가 꺼지면 작동
+  socket.on("close", () => console.log("Disconnected from the Browser ❌"));
+
+  // 브라우저에서 서버로 온 메시지를 받으면 (메시지 출력)작동
+  socket.on("message", (message) => {
+    console.log(message.toString("utf8"));
+  });
+
+  // 서버에서 프론트로 메시지 전송
+  socket.send("hello!!!");
+});
 
 server.listen(3000, handleListen);
