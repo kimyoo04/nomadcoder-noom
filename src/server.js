@@ -17,4 +17,11 @@ const server = http.createServer(app);
 // wss server on top of http server
 const wss = new WebSocket.Server({server});
 
+// 서버의 socket은 연결된 브라우저를 뜻함
+function handleConnection(socket) {
+  console.log(socket);
+}
+// after connection ==> 브라우저가 socket을 받는다.
+wss.on("connection", handleConnection);
+
 server.listen(3000, handleListen);
