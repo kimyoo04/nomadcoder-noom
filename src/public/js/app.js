@@ -12,6 +12,7 @@ let muted = false;
 let cameraOff = false;
 let roomName;
 let myPeerConnection;
+let myDataChannel;
 
 async function getCameras() {
   try {
@@ -132,24 +133,40 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 // Socket Code
 socket.on("welcome", async () => {
+  // Data Channel 생성
+  myDataChannel = myPeerConnection.createDataChannel("chat"); // Data Channel 생성
+  myDataChannel.addEventListener(
+    "message",
+    (event) => console.log(event.data) //TODO: 메시지 UI 생성 로직 추가
+  );
+  console.log("create data channel");
+
+  // offer를 생성
   const offer = await myPeerConnection.createOffer();
   myPeerConnection.setLocalDescription(offer);
-  console.log("sent the offer");
+  console.log("create & sent the offer");
   // offer를 보냄
   socket.emit("offer", offer, roomName);
 });
 
 // offer를 받음
 socket.on("offer", async (offer) => {
-  console.log("received the offer");
+  myPeerConnection.addEventListener("datachannel", (event) => {
+    myDataChannel = event.channel; // 이미 있는 Data Channel 연결
+    myDataChannel.addEventListener(
+      "message",
+      (event) => console.log(event.data) //TODO: 메시지 UI 생성 로직 추가
+    );
+  });
 
+  console.log("received the offer");
   myPeerConnection.setRemoteDescription(offer);
   const answer = await myPeerConnection.createAnswer();
   myPeerConnection.setLocalDescription(answer);
 
   // answer를 보냄
   socket.emit("answer", answer, roomName);
-  console.log("sent the answer");
+  console.log("create & sent the answer");
 });
 
 // answer를 받음
@@ -186,7 +203,7 @@ function makeConnection() {
 }
 
 function handleIce(data) {
-  console.log("sent candidate");
+  console.log("create & sent candidate");
   socket.emit("ice", data.candidate, roomName);
 }
 
