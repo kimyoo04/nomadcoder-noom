@@ -10,7 +10,7 @@
   "bugs": {
     "url": "https://github.com/kimyoo04/nomadcoder-noom/issues"
   },
-  "script": {
+  "scripts": {
     "dev": "nodemon"
   },
   "homepage": "https://github.com/kimyoo04/nomadcoder-noom#readme",
