@@ -14,14 +14,20 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
 wsServer.on("connection", (socket) => {
-  socket.on("join_room", (roomName, done) => {
+  // join room
+  socket.on("join_room", (roomName) => {
     socket.join(roomName);
-    done();
     socket.to(roomName).emit("welcome");
   });
-  // WebRTC signaling
+
+  // send offer
   socket.on("offer", (offer, roomName) => {
     socket.to(roomName).emit("offer", offer);
+  });
+
+  // send answer
+  socket.on("answer", (answer, roomName) => {
+    socket.to(roomName).emit("answer", answer);
   });
 });
 
